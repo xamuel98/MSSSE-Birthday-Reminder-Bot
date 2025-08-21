@@ -7,6 +7,8 @@ class WhatsAppClient {
         this.client = null;
         this.isReady = false;
         this.messageHandlers = [];
+        this.qrCodeHandler = null;
+        this.authenticatedHandler = null;
     }
 
     /**
@@ -44,10 +46,34 @@ class WhatsAppClient {
     setupEventHandlers() {
         // QR Code generation
         this.client.on('qr', (qr) => {
-            console.log('\n=== WhatsApp QR Code ===');
-            console.log('Scan this QR code with your WhatsApp mobile app:');
-            qrcode.generate(qr, { small: true });
-            console.log('========================\n');
+            const isProduction = process.env.NODE_ENV === 'production';
+            
+            // Call external QR code handler if set
+            if (this.qrCodeHandler) {
+                this.qrCodeHandler(qr);
+            }
+            
+            if (isProduction) {
+                // In production (like Render), don't display QR in terminal as it gets broken
+                console.log('\n=== WhatsApp Authentication Required ===');
+                console.log('🔐 WhatsApp QR Code generated for authentication.');
+                console.log('📱 Since this is a production environment, the QR code cannot be displayed in the terminal.');
+                console.log('\n💡 Authentication Options:');
+                console.log('1. Use a local development environment to scan the QR code first');
+                console.log('2. Access the QR code via the web interface at /qr endpoint');
+                console.log('3. The bot will use saved authentication if previously connected');
+                console.log('\n🔗 QR Code Data (for manual processing):');
+                console.log(qr);
+                console.log('\n📋 You can use online QR code generators to convert the above data to a scannable QR code.');
+                console.log('🌐 Or visit your deployment URL + /qr to get the QR code data via API.');
+                console.log('==========================================\n');
+            } else {
+                // In development, show QR code normally
+                console.log('\n=== WhatsApp QR Code ===');
+                console.log('Scan this QR code with your WhatsApp mobile app:');
+                qrcode.generate(qr, { small: true });
+                console.log('========================\n');
+            }
         });
 
         // Client ready
@@ -63,6 +89,11 @@ class WhatsAppClient {
         // Authentication success
         this.client.on('authenticated', () => {
             console.log('✅ WhatsApp authentication successful!');
+            
+            // Call external authenticated handler if set
+            if (this.authenticatedHandler) {
+                this.authenticatedHandler();
+            }
         });
 
         // Authentication failure
@@ -293,6 +324,20 @@ class WhatsAppClient {
             return null;
         }
         return this.client.info;
+    }
+
+    /**
+     * Set QR code handler
+     */
+    setQRCodeHandler(handler) {
+        this.qrCodeHandler = handler;
+    }
+
+    /**
+     * Set authenticated handler
+     */
+    setAuthenticatedHandler(handler) {
+        this.authenticatedHandler = handler;
     }
 
     /**

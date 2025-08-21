@@ -1,5 +1,5 @@
 const database = require('../database');
-const crypto = require('crypto');
+const { v4: uuidv4 } = require('crypto');
 
 class GroupRepository {
     /**
@@ -65,7 +65,7 @@ class GroupRepository {
      * Add member to group
      */
     async addMemberToGroup(phoneNumber, groupId, isAdmin = false) {
-        const memberId = crypto.randomUUID();
+        const memberId = uuidv4();
         const sql = `
             INSERT OR REPLACE INTO group_members (id, phone_number, group_id, is_admin, joined_at)
             VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)

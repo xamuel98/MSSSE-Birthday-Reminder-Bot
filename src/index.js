@@ -18,6 +18,7 @@ class BirthdayReminderBot {
         this.port = process.env.PORT || 3000;
         this.isInitialized = false;
         this.startTime = new Date();
+        this.currentQRCode = null; // Store current QR code for web access
         
         // Setup express middleware
         this.setupExpress();
@@ -81,6 +82,16 @@ class BirthdayReminderBot {
             // Setup message handler
             whatsappClient.addMessageHandler(async (message, chat, contact) => {
                 await this.handleMessage(message, chat, contact);
+            });
+            
+            // Setup QR code handler for production
+            whatsappClient.setQRCodeHandler((qrCode) => {
+                this.currentQRCode = qrCode;
+            });
+            
+            // Clear QR code when authenticated
+            whatsappClient.setAuthenticatedHandler(() => {
+                this.currentQRCode = null;
             });
             
             // Initialize client
@@ -169,6 +180,27 @@ class BirthdayReminderBot {
             }
         });
         
+        // QR Code endpoint for production authentication
+        this.app.get('/qr', (req, res) => {
+            if (!this.currentQRCode) {
+                return res.status(404).json({ 
+                    error: 'No QR code available', 
+                    message: 'WhatsApp client may already be authenticated or not yet initialized' 
+                });
+            }
+            
+            res.json({
+                qrCode: this.currentQRCode,
+                message: 'Use this QR code data with an online QR code generator to create a scannable code',
+                instructions: [
+                    '1. Copy the qrCode data below',
+                    '2. Go to an online QR code generator (e.g., qr-code-generator.com)',
+                    '3. Paste the data and generate the QR code',
+                    '4. Scan with your WhatsApp mobile app'
+                ]
+            });
+        });
+        
         // Root endpoint
         this.app.get('/', (req, res) => {
             res.json({
@@ -178,6 +210,7 @@ class BirthdayReminderBot {
                 endpoints: {
                     health: '/health',
                     status: '/status',
+                    qr: '/qr (for production authentication)',
                     triggerBirthdayCheck: 'POST /trigger/birthday-check',
                     triggerCreateReminders: 'POST /trigger/create-reminders'
                 }
