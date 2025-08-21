@@ -155,11 +155,11 @@ class WhatsAppClient {
         }
 
         // Check if this is the target group (if TARGET_GROUP_ID is set)
-        const targetGroupId = process.env.TARGET_GROUP_ID;
-        if (targetGroupId && chat.id._serialized !== targetGroupId) {
-            // Silently ignore messages from other groups
-            return;
-        }
+        // const targetGroupId = process.env.TARGET_GROUP_ID;
+        // if (targetGroupId && chat.id._serialized !== targetGroupId) {
+        //     // Silently ignore messages from other groups
+        //     return;
+        // }
 
         // Skip messages from the bot itself unless they are commands
         // This prevents infinite loops while allowing the bot to respond to its own commands

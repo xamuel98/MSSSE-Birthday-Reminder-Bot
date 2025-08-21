@@ -237,11 +237,11 @@ class BirthdayReminderBot {
             }
             
             // Check if this is the target group (if TARGET_GROUP_ID is set)
-            const targetGroupId = process.env.TARGET_GROUP_ID;
-            if (targetGroupId && chat.id._serialized !== targetGroupId) {
-                // Silently ignore messages from other groups
-                return;
-            }
+            // const targetGroupId = process.env.TARGET_GROUP_ID;
+            // if (targetGroupId && chat.id._serialized !== targetGroupId) {
+            //     // Silently ignore messages from other groups
+            //     return;
+            // }
             
             // Log message for debugging
             console.log(`📨 Message from ${contact.pushname || contact.number} in ${chat.name} (Group ID: ${chat.id._serialized}): ${message.body}`);
