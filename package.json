@@ -1,0 +1,29 @@
+{
+  "name": "birthday-reminder-bot",
+  "version": "1.0.0",
+  "description": "WhatsApp bot that sends automated birthday reminders to group chats with user tagging and command-based birthday management",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "birthday",
+    "reminder",
+    "automation"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "moment": "^2.30.1",
+    "node-cron": "^4.2.1",
+    "qrcode-terminal": "^0.12.0",
+    "sqlite3": "^5.1.7",
+    "whatsapp-web.js": "^1.32.0"
+  }
+}
